@@ -1,0 +1,68 @@
+Jane Lockshin
+CSCI 442: Operating Systems
+Project 1, Final Deliverable
+March 22, 2019
+
+JaneLockshin-Final.zip includes:
+- src
+- Makefile
+- README (this)
+- example_simulation.txt (from Canvas)
+
+src folder includes:
+- main.cpp (runs scheduler simulation)
+- simulator.cpp (handles all functions in simulation)
+- Process.h (header file for processes)
+- Event.h (header file for events)
+- Thread.h (header file for threads)
+- Burst.h (header file for bursts)
+- Simulator.h (header file for simulator)
+- ParseArgs.h (header file for command line input)
+- ParseArgs.cpp (handles all functions for command line flags)
+- Priority.h (header file for priority types)
+- Priority.cpp (handles functions for priority types)
+- SchedulingAlgorithm.h (header file for scheduling algorithms)
+- FCFS.h (header file for First-Come First-Served algorithm)
+- RoundRobin.h (header file for Round-Robin Algorithm)
+- PriorityAlgorithm.h (header file for Priority Algorithm)
+- CustomAlgorithm.h (header file for Custom Algorithm - described below)
+
+To build the code: unzip and cd into 'JaneLockshin-Final' and type:
+'make'
+
+To run the code, type:
+./simulator [flags] simulation_file.txt
+
+To remove the compiled binary files: type 'make clean'
+To build and run the program (with 'example_simulation.txt'): type 'make run'
+
+Flags:
+-t, --per_thread (outputs additional per-thread statistics)
+-v, --verbose (outputs info about every state-changing event and scheduling decision)
+-h, --help (displays a help message and exits)
+-a, --algorithm (specifies algorithm to use, FCFS is default)
+
+Approximate number of hours spent on the project: 40
+
+Custom CPU Scheduling Algorithm:
+The custom algorithm for CPU scheduling uses features form both the priority algorithm and the round-robin algorithm
+(in the sense that priority queues are used, as well as time quantums).
+This algorithm uses five priority queues: 4 for each thread priority type (similar to how the priority algorithm operates),
+and 1 event queue to handle events in order to schedule the threads (this event queue is manipulated when the program calls simulator.cpp).
+The priority queues handle each thread in their corresponding queues in a similar manner to FCFS in order to
+prevent starvation for the older threads in the queue (the "oldest" threads are executed first).
+
+Fairness was implemented in this algorithm as an approach to optimize the scheduler, as well as prefer threads with higher priorities.
+A weighted probability is assigned that favors threads in the order of priority: system, interactive, normal, and batch.
+This "weighted probability" is done by choosing a random number, and assigning that number its corresponding priority queue.
+As mentioned before, these weighted numbers favor queues with higher priorities
+(so threads with higher priorities have a higher chance of being executed, but lower priorities also have a chance to execute, hence the "fairness").
+If a priority queue that does not contain any threads is chosen, then the algorithm selects the queue with the next priority (of the one that was previously selected).
+This approach favors executing threads based on their priority type, but the random selection (weighted probability) promotes fairness (so all of the threads have a chance to execute).
+
+The algorithm also provides fairness by using time quantums (which also makes the algorithm preemptive),
+with longer time quantums to the threads with lower priorities ("batch" priority types get the longest time of 6 units, "normal" gets 5, "interactive" gets 4, "while "system" gets 3 time units).
+That way, if there are a lot of "system" threads, they will be preempted at a faster rate to ensure time for lower-priority threads.
+
+Even though the algorithm implements fairness to prevent starvation, starvation can still occur.
+Depending on the execution time of newly-added threads, starvation may occur if these new threads are arriving at a faster rate than the system and scheduler can handle.
